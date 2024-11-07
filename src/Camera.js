@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import Experience from "./Experience";
 
@@ -24,7 +24,8 @@ export default class Camera {
       this.nearClip,
       this.farClip
     );
-    this.instance.position.set(0, 0, 5);
+    this.instance.position.set(0, 2, 5);
+    this.instance.lookAt(0, 0, 0);
   }
 
   setOrbitControls() {

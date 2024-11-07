@@ -1,7 +1,8 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
 import Experience from "../Experience";
 import Environment from "./Environment";
 import Water from "./Water";
+import * as TSL from "three/tsl";
 
 export default class World {
   constructor() {
@@ -17,13 +18,43 @@ export default class World {
       // Setup
       this.environment = new Environment();
 
-      this.scene.add(this.resources.items.poolMesh.scene);
+      const topTexture = this.resources.items.iceColor;
+      topTexture.colorSpace = THREE.SRGBColorSpace;
 
-      this.waterSim = new Water();
+      const bottomTexture = this.resources.items.concreteColor;
+      bottomTexture.colorSpace = THREE.SRGBColorSpace;
+      bottomTexture.wrapS = THREE.RepeatWrapping;
+      bottomTexture.wrapT = THREE.RepeatWrapping;
+
+      const roughnessTexture = this.resources.items.iceRoughness;
+      roughnessTexture.colorSpace = THREE.NoColorSpace;
+
+      const normalTexture = this.resources.items.iceNormal;
+      normalTexture.colorSpace = THREE.NoColorSpace;
+
+      const heightTexture = this.resources.items.iceHeight;
+      heightTexture.colorSpace = THREE.NoColorSpace;
+
+      // Parallax Effect
+      const parallaxScale = 0.3;
+      const offsetUV = TSL.texture(heightTexture).mul(parallaxScale);
+
+      const parallaxUVOffset = TSL.parallaxUV(TSL.uv(), offsetUV);
+      const parallaxResult = TSL.texture(bottomTexture, parallaxUVOffset);
+
+      const iceNode = TSL.overlay(TSL.texture(topTexture), parallaxResult);
+
+      const testGeo = new THREE.BoxGeometry(2, 2, 2);
+      const testMaterial = new THREE.MeshStandardNodeMaterial();
+      testMaterial.colorNode = iceNode.mul(5);
+      testMaterial.roughnessNode = TSL.texture(roughnessTexture);
+      // testMaterial.normalNode = TSL.texture(normalTexture);
+      this.testPlane = new THREE.Mesh(testGeo, testMaterial);
+      this.scene.add(this.testPlane);
     });
   }
 
   update() {
-    if (this.waterSim) this.waterSim.update();
+    // if (this.waterSim) this.waterSim.update();
   }
 }

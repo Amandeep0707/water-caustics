@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
 import Experience from "./Experience";
 
 export default class Renderer {
@@ -14,7 +14,7 @@ export default class Renderer {
   }
 
   setInstance() {
-    this.instance = new THREE.WebGLRenderer({
+    this.instance = new THREE.WebGPURenderer({
       canvas: this.canvas,
       antialias: true,
       alpha: true,
@@ -35,6 +35,6 @@ export default class Renderer {
   }
 
   update() {
-    this.instance.render(this.scene, this.camera.instance);
+    this.instance.renderAsync(this.scene, this.camera.instance);
   }
 }

@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
 import Experience from "../Experience";
 
 export default class Environment {
@@ -37,7 +37,7 @@ export default class Environment {
       this.scene.traverse((child) => {
         if (
           child instanceof THREE.Mesh &&
-          child.material instanceof THREE.MeshStandardMaterial
+          child.material instanceof THREE.MeshStandardNodeMaterial
         ) {
           child.material.envMap = this.environmentMap.texture;
           child.material.envMapIntensity = this.environmentMap.intensity;

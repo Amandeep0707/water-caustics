@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "three/webgpu";
 import Sizes from "./Utils/Sizes.js";
 import Time from "./Utils/Time.js";
 import Camera from "./Camera.js";
@@ -18,6 +18,9 @@ export default class Experience {
     }
     instance = this;
 
+    // Constants
+    this.usePostProcessing = false;
+
     // Global Access
     window.experience = this;
 
@@ -32,8 +35,9 @@ export default class Experience {
     this.resources = new Resources(sources);
     this.camera = new Camera();
     this.renderer = new Renderer();
-    this.postProcess = new PostProcess();
     this.world = new World();
+
+    if (this.usePostProcessing) this.postProcess = new PostProcess();
 
     // Sizes resize event
     this.sizes.on("resize", () => {
@@ -41,15 +45,13 @@ export default class Experience {
     });
 
     // Tick Event
-    this.time.on("tick", () => {
-      this.update();
-    });
+    this.renderer.instance.setAnimationLoop(this.update.bind(this));
   }
 
   resize() {
     this.camera.resize();
     this.renderer.resize();
-    this.postProcess.resize();
+    if (this.postProcess) this.postProcess.resize();
   }
 
   update() {
@@ -59,7 +61,7 @@ export default class Experience {
     this.camera.update();
     this.world.update();
     this.renderer.update();
-    this.postProcess.update();
+    if (this.postProcess) this.postProcess.resize();
 
     // Frame trace ends here
     if (this.debug.active) this.debug.stats.end();
