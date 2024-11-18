@@ -1,8 +1,11 @@
 import * as THREE from "three/webgpu";
 import Experience from "./Experience";
+import EventEmitter from "./Utils/EventEmitter";
 
-export default class Renderer {
+export default class Renderer extends EventEmitter {
   constructor() {
+    super();
+
     this.experience = new Experience();
 
     this.canvas = this.experience.canvas;

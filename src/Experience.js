@@ -45,7 +45,10 @@ export default class Experience {
     });
 
     // Tick Event
-    this.renderer.instance.setAnimationLoop(this.update.bind(this));
+    this.time.on("tick", () => {
+      this.update();
+    });
+    // this.renderer.instance.setAnimationLoop(this.update.bind(this));
   }
 
   resize() {

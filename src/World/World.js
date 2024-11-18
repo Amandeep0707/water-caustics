@@ -1,7 +1,6 @@
 import * as THREE from "three/webgpu";
 import Experience from "../Experience";
 import Environment from "./Environment";
-import Water from "./Water";
 import * as TSL from "three/tsl";
 
 export default class World {
@@ -48,7 +47,6 @@ export default class World {
       const testMaterial = new THREE.MeshStandardNodeMaterial();
       testMaterial.colorNode = iceNode.mul(5);
       testMaterial.roughnessNode = TSL.texture(roughnessTexture);
-      // testMaterial.normalNode = TSL.texture(normalTexture);
       this.testPlane = new THREE.Mesh(testGeo, testMaterial);
       this.scene.add(this.testPlane);
     });

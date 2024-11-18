@@ -5,14 +5,15 @@ export default class Environment {
   constructor() {
     this.experience = new Experience();
     this.scene = this.experience.scene;
+    this.renderer = this.experience.renderer.instance;
     this.resources = this.experience.resources;
 
-    // this.setSunlight();
+    this.setSunlight();
     this.setEnvironmentMap();
   }
 
   setSunlight() {
-    this.sunLight = new THREE.DirectionalLight("#ffffff", 1);
+    this.sunLight = new THREE.DirectionalLight("#ffffff", 3);
     this.sunLight.castShadow = true;
     this.sunLight.shadow.camera.far = 15;
     this.sunLight.shadow.mapSize.set(1024, 1024);
@@ -22,15 +23,15 @@ export default class Environment {
   }
 
   setEnvironmentMap() {
-    const pmremGenerator = new THREE.PMREMGenerator(
-      this.experience.renderer.instance
-    );
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
 
     this.environmentMap = {};
     this.environmentMap.intensity = 1;
     this.environmentMap.texture = pmremGenerator.fromEquirectangular(
-      this.resources.items.environmentMapTexture
+      this.resources.items.environmentMapTexture,
+      this.renderer.getRenderTarget()
     ).texture;
+
     this.scene.environment = this.environmentMap.texture;
 
     this.environmentMap.updateMaterial = () => {
