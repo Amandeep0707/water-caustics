@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import * as TSL from "three/tsl";
 import Experience from "../Experience";
 
 export default class Environment {
@@ -8,7 +9,6 @@ export default class Environment {
     this.renderer = this.experience.renderer.instance;
     this.resources = this.experience.resources;
 
-    this.setSunlight();
     this.setEnvironmentMap();
   }
 
@@ -23,16 +23,15 @@ export default class Environment {
   }
 
   setEnvironmentMap() {
-    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-
     this.environmentMap = {};
     this.environmentMap.intensity = 1;
-    this.environmentMap.texture = pmremGenerator.fromEquirectangular(
-      this.resources.items.environmentMapTexture,
-      this.renderer.getRenderTarget()
-    ).texture;
 
-    this.scene.environment = this.environmentMap.texture;
+    this.scene.environmentNode = TSL.pmremTexture(
+      this.resources.items.environmentMapTexture
+    );
+    this.scene.backgroundNode = TSL.pmremTexture(
+      this.resources.items.environmentMapTexture
+    );
 
     this.environmentMap.updateMaterial = () => {
       this.scene.traverse((child) => {

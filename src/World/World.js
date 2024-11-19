@@ -1,7 +1,7 @@
 import * as THREE from "three/webgpu";
+import * as TSL from "three/tsl";
 import Experience from "../Experience";
 import Environment from "./Environment";
-import * as TSL from "three/tsl";
 
 export default class World {
   constructor() {
@@ -16,43 +16,47 @@ export default class World {
     this.resources.on("ready", () => {
       // Setup
       this.environment = new Environment();
-
-      const topTexture = this.resources.items.iceColor;
-      topTexture.colorSpace = THREE.SRGBColorSpace;
-
-      const bottomTexture = this.resources.items.concreteColor;
-      bottomTexture.colorSpace = THREE.SRGBColorSpace;
-      bottomTexture.wrapS = THREE.RepeatWrapping;
-      bottomTexture.wrapT = THREE.RepeatWrapping;
-
-      const roughnessTexture = this.resources.items.iceRoughness;
-      roughnessTexture.colorSpace = THREE.NoColorSpace;
-
-      const normalTexture = this.resources.items.iceNormal;
-      normalTexture.colorSpace = THREE.NoColorSpace;
-
-      const heightTexture = this.resources.items.iceHeight;
-      heightTexture.colorSpace = THREE.NoColorSpace;
-
-      // Parallax Effect
-      const parallaxScale = 0.3;
-      const offsetUV = TSL.texture(heightTexture).mul(parallaxScale);
-
-      const parallaxUVOffset = TSL.parallaxUV(TSL.uv(), offsetUV);
-      const parallaxResult = TSL.texture(bottomTexture, parallaxUVOffset);
-
-      const iceNode = TSL.overlay(TSL.texture(topTexture), parallaxResult);
-
-      const testGeo = new THREE.BoxGeometry(2, 2, 2);
-      const testMaterial = new THREE.MeshStandardNodeMaterial();
-      testMaterial.colorNode = iceNode.mul(5);
-      testMaterial.roughnessNode = TSL.texture(roughnessTexture);
-      this.testPlane = new THREE.Mesh(testGeo, testMaterial);
-      this.scene.add(this.testPlane);
+      this.init();
     });
   }
 
-  update() {
-    // if (this.waterSim) this.waterSim.update();
+  init() {
+    this.planeGeo = new THREE.PlaneGeometry(2, 2, 20, 20);
+    this.planeMat = new THREE.MeshStandardNodeMaterial();
+    this.planeMesh = new THREE.Mesh(this.planeGeo, this.planeMat);
+    this.planeMesh.rotateX(Math.PI / 2);
+    this.scene.add(this.planeMesh);
+
+    this.params = {
+      distanceFactor: TSL.uniform(1),
+      distanceSpeed: TSL.uniform(2),
+    };
+
+    if (this.debug.active) {
+      this.debug.ui.addBinding(this.params.distanceFactor, "value", {
+        min: 0,
+        max: 2,
+        step: 0.01,
+      });
+      this.debug.ui.addBinding(this.params.distanceSpeed, "value", {
+        min: 0,
+        max: 2,
+        step: 0.01,
+      });
+    }
+
+    this.planeMat.wireframe = true;
+    this.planeMat.colorNode = new THREE.Color(0x000000);
+    this.planeMat.positionNode = TSL.Fn(() => {
+      const position = TSL.positionLocal;
+
+      const move = TSL.sin(TSL.time.mul(this.params.distanceSpeed));
+
+      position.z.addAssign(move.mul(this.params.distanceFactor));
+
+      return TSL.positionLocal;
+    })();
   }
+
+  update() {}
 }
