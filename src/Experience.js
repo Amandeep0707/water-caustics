@@ -48,7 +48,6 @@ export default class Experience {
     this.time.on("tick", () => {
       this.update();
     });
-    // this.renderer.instance.setAnimationLoop(this.update.bind(this));
   }
 
   resize() {
