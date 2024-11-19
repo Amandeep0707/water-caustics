@@ -19,7 +19,7 @@ export default class Experience {
     instance = this;
 
     // Constants
-    this.usePostProcessing = false;
+    this.usePostProcessing = true;
 
     // Global Access
     window.experience = this;
@@ -63,7 +63,7 @@ export default class Experience {
     this.camera.update();
     this.world.update();
     this.renderer.update();
-    if (this.postProcess) this.postProcess.resize();
+    if (this.postProcess) this.postProcess.update();
 
     // Frame trace ends here
     if (this.debug.active) this.debug.stats.end();

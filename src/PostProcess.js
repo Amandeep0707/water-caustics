@@ -2,8 +2,7 @@ import * as THREE from "three/webgpu";
 import Experience from "./Experience";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader.js";
+import { bloom } from "three/addons/tsl/display/BloomNode.js";
 
 export default class PostProcess {
   constructor() {
@@ -16,31 +15,39 @@ export default class PostProcess {
     /**
      * Post processing
      */
-    const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
-      samples: 2,
-    });
+    // const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
+    //   samples: 2,
+    // });
 
-    this.effectComposer = new EffectComposer(this.renderer, renderTarget);
-    this.effectComposer.setPixelRatio(this.sizes.pixelRatio);
-    this.effectComposer.setSize(this.sizes.width, this.sizes.height);
+    // this.effectComposer = new Effe`ctComposer(this.renderer, renderTarget);
+    // this.effectComposer.setPixelRatio(this.sizes.pixelRatio);
+    // this.effectComposer.setSize(this.sizes.width, this.sizes.height);
 
-    // Render pass
-    this.renderPass = new RenderPass(this.scene, this.camera);
-    this.effectComposer.addPass(this.renderPass);
+    // // Render pass
+    // this.renderPass = new RenderPass(this.scene, this.camera);
+    // this.effectComposer.addPass(this.renderPass);
 
-    // // Gamma Correction Pass
-    // // Use this pass if using other color related passes only.
-    // this.gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
-    // this.effectComposer.addPass(this.gammaCorrectionPass);
+    const scenePass = THREE.pass(this.scene, this.camera);
+    scenePass.setMRT(THREE.mrt(THREE.output, THREE.emissive));
+
+    const outputPass = scenePass.getTextureNode();
+    const emissivePass = scenePass.getTextureNode("emissive");
+
+    const bloomPass = bloom(emissivePass, 2.5, 0.5);
+
+    const postProcessing = new THREE.PostProcessing(this.renderer);
+    postProcessing.outputNode = outputPass.add(bloomPass);
+
+    console.log(postProcessing);
   }
 
   resize() {
-    // Update effect composer
-    this.effectComposer.setSize(this.sizes.width, this.sizes.height);
-    this.effectComposer.setPixelRatio(this.sizes.pixelRatio);
+    // // Update effect composer
+    // this.effectComposer.setSize(this.sizes.width, this.sizes.height);
+    // this.effectComposer.setPixelRatio(this.sizes.pixelRatio);
   }
 
   update() {
-    this.effectComposer.render();
+    // this.effectComposer.render();
   }
 }

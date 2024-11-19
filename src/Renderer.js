@@ -20,7 +20,6 @@ export default class Renderer extends EventEmitter {
     this.instance = new THREE.WebGPURenderer({
       canvas: this.canvas,
       antialias: true,
-      alpha: true,
     });
 
     this.instance.setSize(this.sizes.width, this.sizes.height);

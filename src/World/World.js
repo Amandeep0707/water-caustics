@@ -2,7 +2,6 @@ import * as THREE from "three/webgpu";
 import Experience from "../Experience";
 import Environment from "./Environment";
 import { TransformControls } from "three/examples/jsm/Addons.js";
-import { smoothstep } from "three/webgpu";
 
 export default class World {
   constructor() {
@@ -266,6 +265,93 @@ export default class World {
     const geometry = new THREE.PlaneGeometry(1, 1);
     const mesh = new THREE.InstancedMesh(geometry, material, count);
     this.scene.add(mesh);
+
+    if (this.debug.active) {
+      const particlesDebug = this.debug.ui.addFolder({
+        title: "Particles",
+      });
+      particlesDebug
+        .addBinding(
+          { attractorMassExponent: attractorMass.value.toString().length - 1 },
+          "attractorMassExponent",
+          {
+            min: 1,
+            max: 10,
+            step: 1,
+            label: "Attractor Mass Exponent",
+          }
+        )
+        .on("change", (e) => {
+          attractorMass.value = Number(`1e${e.value}`);
+        });
+
+      particlesDebug
+        .addBinding(
+          {
+            particleGlobalMassExponent:
+              particleGlobalMass.value.toString().length - 1,
+          },
+          "particleGlobalMassExponent",
+          {
+            min: 1,
+            max: 10,
+            step: 1,
+            label: "Particles Global Mass Exponent",
+          }
+        )
+        .on("change", (e) => {
+          particleGlobalMass.value = Number(`1e${e.value}`);
+        });
+
+      particlesDebug.addBinding(maxSpeed, "value", {
+        min: 0,
+        max: 10,
+        step: 0.01,
+        label: "Max Speed",
+      });
+      particlesDebug.addBinding(velocityDamping, "value", {
+        min: 0,
+        max: 0.1,
+        step: 0.001,
+        label: "Velocity Damping",
+      });
+      particlesDebug.addBinding(spinningStrength, "value", {
+        min: 0,
+        max: 10,
+        step: 0.01,
+        label: "Spinning Strength",
+      });
+      particlesDebug.addBinding(scale, "value", {
+        min: 0,
+        max: 0.1,
+        step: 0.001,
+        label: "Particle Scale",
+      });
+      particlesDebug.addBinding(boundHalfExtent, "value", {
+        min: 0,
+        max: 20,
+        step: 0.01,
+        label: "Bounds",
+      });
+      particlesDebug.addBinding({ color: colorA.value }, "color", {
+        view: "color",
+        color: {
+          type: "float",
+        },
+        picker: "inline",
+        expanded: true,
+        label: "Primary Color",
+      });
+      particlesDebug.addBinding({ color: colorB.value }, "color", {
+        view: "color",
+        color: {
+          type: "float",
+        },
+        picker: "inline",
+        expanded: true,
+        label: "Secondary Color",
+      });
+    }
   }
 
   update() {
