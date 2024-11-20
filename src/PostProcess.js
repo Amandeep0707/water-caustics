@@ -12,21 +12,6 @@ export default class PostProcess {
     this.renderer = this.experience.renderer.instance;
     this.sizes = this.experience.sizes;
 
-    /**
-     * Post processing
-     */
-    // const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
-    //   samples: 2,
-    // });
-
-    // this.effectComposer = new Effe`ctComposer(this.renderer, renderTarget);
-    // this.effectComposer.setPixelRatio(this.sizes.pixelRatio);
-    // this.effectComposer.setSize(this.sizes.width, this.sizes.height);
-
-    // // Render pass
-    // this.renderPass = new RenderPass(this.scene, this.camera);
-    // this.effectComposer.addPass(this.renderPass);
-
     const scenePass = THREE.pass(this.scene, this.camera);
     scenePass.setMRT(THREE.mrt(THREE.output, THREE.emissive));
 
@@ -37,8 +22,6 @@ export default class PostProcess {
 
     const postProcessing = new THREE.PostProcessing(this.renderer);
     postProcessing.outputNode = outputPass.add(bloomPass);
-
-    console.log(postProcessing);
   }
 
   resize() {

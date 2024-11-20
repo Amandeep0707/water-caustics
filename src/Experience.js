@@ -19,7 +19,7 @@ export default class Experience {
     instance = this;
 
     // Constants
-    this.usePostProcessing = true;
+    this.usePostProcessing = false;
 
     // Global Access
     window.experience = this;
