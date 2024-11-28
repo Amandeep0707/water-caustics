@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import * as RAPIER from "@dimforge/rapier3d";
 import Experience from "../Experience";
 import Environment from "./Environment";
 import Grid from "../Utils/Grid";
@@ -17,8 +18,14 @@ export default class World {
     this.resources.on("ready", () => {
       // Setup
       this.environment = new Environment();
-      // this.init();
+      this.init();
     });
+  }
+
+  init() {
+    this.scene.add(this.resources.items.damagedHelmet.scene);
+
+    console.log(RAPIER);
   }
 
   update() {}

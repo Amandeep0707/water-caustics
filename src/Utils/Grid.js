@@ -15,6 +15,7 @@ export default class Grid {
     const cameraPos = THREE.uniform(camera.position, "vec3");
     const angleFadeControl = THREE.uniform(20);
     const distanceControl = THREE.uniform(0.01);
+    const gridColor = THREE.uniform(THREE.color(0x505050));
 
     const fragmentShader = THREE.Fn(() => {
       const uv = THREE.positionWorld.xz.mul(uvScale);
@@ -36,10 +37,13 @@ export default class Grid {
 
       let color = THREE.uniform(1).sub(THREE.min(line, THREE.uniform(1)));
       color = color.mul(angle).mul(distance);
-      return color;
+
+      return THREE.vec4(gridColor, color.x);
     });
 
     planeMat.fragmentNode = fragmentShader();
+    planeMat.side = THREE.DoubleSide;
+    planeMat.transparent = true;
 
     if (this.debug.active) {
       const gridFolder = this.debug.ui.addFolder({
@@ -63,6 +67,14 @@ export default class Grid {
         max: 0.1,
         step: 0.001,
         label: "Distance Control",
+      });
+      gridFolder.addBinding(gridColor, "value", {
+        view: "color",
+        color: {
+          alpha: true,
+          type: "float",
+        },
+        label: "Grid Color",
       });
     }
   }
