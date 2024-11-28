@@ -1,5 +1,4 @@
 import * as THREE from "three/webgpu";
-import * as RAPIER from "@dimforge/rapier3d";
 import Experience from "../Experience";
 import Environment from "./Environment";
 import Grid from "../Utils/Grid";
