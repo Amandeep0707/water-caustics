@@ -1,7 +1,5 @@
 import * as THREE from "three/webgpu";
 import Experience from "./Experience";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { bloom } from "three/addons/tsl/display/BloomNode.js";
 
 export default class PostProcess {
@@ -24,13 +22,7 @@ export default class PostProcess {
     postProcessing.outputNode = outputPass.add(bloomPass);
   }
 
-  resize() {
-    // // Update effect composer
-    // this.effectComposer.setSize(this.sizes.width, this.sizes.height);
-    // this.effectComposer.setPixelRatio(this.sizes.pixelRatio);
-  }
+  resize() {}
 
-  update() {
-    // this.effectComposer.render();
-  }
+  update() {}
 }
