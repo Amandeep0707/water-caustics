@@ -23,8 +23,6 @@ export default class World {
 
   init() {
     this.scene.add(this.resources.items.damagedHelmet.scene);
-
-    console.log(RAPIER);
   }
 
   update() {}

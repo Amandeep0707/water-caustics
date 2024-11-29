@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import * as TSL from "three/tsl";
 import Experience from "../Experience";
 
 export default class Environment {
@@ -25,7 +26,7 @@ export default class Environment {
     this.environmentMap = {};
     this.environmentMap.intensity = 1;
 
-    this.scene.environmentNode = THREE.pmremTexture(
+    this.scene.environmentNode = TSL.pmremTexture(
       this.resources.items.environmentMapTexture
     );
 

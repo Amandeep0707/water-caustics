@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import * as TSL from "three/tsl";
 import Experience from "../Experience";
 
 export default class Grid {
@@ -11,34 +12,34 @@ export default class Grid {
     planeMesh.rotateX(Math.PI * -0.5);
     scene.add(planeMesh);
 
-    const uvScale = THREE.uniform(1);
-    const cameraPos = THREE.uniform(camera.position, "vec3");
-    const angleFadeControl = THREE.uniform(20);
-    const distanceControl = THREE.uniform(0.01);
-    const gridColor = THREE.uniform(THREE.color(0x505050));
+    const uvScale = TSL.uniform(1);
+    const cameraPos = TSL.uniform(camera.position, "vec3");
+    const angleFadeControl = TSL.uniform(20);
+    const distanceControl = TSL.uniform(0.01);
+    const gridColor = TSL.uniform(TSL.color(0x505050));
 
-    const fragmentShader = THREE.Fn(() => {
-      const uv = THREE.positionWorld.xz.mul(uvScale);
+    const fragmentShader = TSL.Fn(() => {
+      const uv = TSL.positionWorld.xz.mul(uvScale);
 
-      const grid = THREE.abs(
-        THREE.fract(uv.sub(THREE.uniform(0.5))).sub(THREE.uniform(0.5))
-      ).div(THREE.fwidth(uv));
-      let angle = THREE.fwidth(uv);
-      angle = THREE.uniform(1).sub(angle);
-      angle = THREE.pow(angle, angleFadeControl);
-      angle = THREE.clamp(angle, THREE.uniform(0), THREE.uniform(1));
-      angle = THREE.min(angle.x, angle.y);
-      const line = THREE.min(grid.x, grid.y);
-      let distance = THREE.distance(cameraPos, THREE.positionWorld).mul(
+      const grid = TSL.abs(
+        TSL.fract(uv.sub(TSL.uniform(0.5))).sub(TSL.uniform(0.5))
+      ).div(TSL.fwidth(uv));
+      let angle = TSL.fwidth(uv);
+      angle = TSL.uniform(1).sub(angle);
+      angle = TSL.pow(angle, angleFadeControl);
+      angle = TSL.clamp(angle, TSL.uniform(0), TSL.uniform(1));
+      angle = TSL.min(angle.x, angle.y);
+      const line = TSL.min(grid.x, grid.y);
+      let distance = TSL.distance(cameraPos, TSL.positionWorld).mul(
         distanceControl
       );
-      distance = THREE.uniform(1).sub(distance);
-      distance = THREE.clamp(distance, THREE.uniform(0), THREE.uniform(1));
+      distance = TSL.uniform(1).sub(distance);
+      distance = TSL.clamp(distance, TSL.uniform(0), TSL.uniform(1));
 
-      let color = THREE.uniform(1).sub(THREE.min(line, THREE.uniform(1)));
+      let color = TSL.uniform(1).sub(TSL.min(line, TSL.uniform(1)));
       color = color.mul(angle).mul(distance);
 
-      return THREE.vec4(gridColor, color.x);
+      return TSL.vec4(gridColor, color.x);
     });
 
     planeMat.fragmentNode = fragmentShader();
