@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import EventEmitter from "./Utils/EventEmitter.js";
 import Sizes from "./Utils/Sizes.js";
 import Time from "./Utils/Time.js";
 import Camera from "./Camera.js";
@@ -8,11 +9,14 @@ import Debug from "./Utils/Debug.js";
 import Resources from "./Utils/Resources.js";
 import sources from "./sources.js";
 import PostProcess from "./PostProcess.js";
+import { Physics, DebugPhysics } from "./Physics.js";
 
 let instance = null;
 
-export default class Experience {
+export default class Experience extends EventEmitter {
   constructor(canvas) {
+    super();
+
     if (instance) {
       return instance;
     }
@@ -20,6 +24,7 @@ export default class Experience {
 
     // Constants
     this.usePostProcessing = false;
+    this.usePhysics = true;
 
     // Global Access
     window.experience = this;
@@ -38,6 +43,7 @@ export default class Experience {
     this.world = new World();
 
     if (this.usePostProcessing) this.postProcess = new PostProcess();
+    if (this.usePhysics) this.physics = new Physics();
 
     // Sizes resize event
     this.sizes.on("resize", () => {
@@ -59,6 +65,8 @@ export default class Experience {
   update() {
     // Frame trace begins here
     if (this.debug.active) this.debug.stats.begin();
+
+    this.trigger("tick");
 
     this.camera.update();
     this.world.update();
