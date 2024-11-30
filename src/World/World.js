@@ -1,5 +1,4 @@
 import * as THREE from "three/webgpu";
-import RAPIER from "https://cdn.skypack.dev/pin/@dimforge/rapier3d-compat@v0.14.0-9fFno0Co5H1pOBbDcBZz/mode=imports/optimized/@dimforge/rapier3d-compat.js";
 import Experience from "../Experience";
 import Environment from "./Environment";
 import Grid from "../Utils/Grid";
@@ -19,12 +18,37 @@ export default class World {
     this.resources.on("ready", () => {
       // Setup
       this.environment = new Environment();
-      this.init();
     });
   }
 
   init() {
     if (this.physics) {
+      const visualCube = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshNormalNodeMaterial()
+      );
+      visualCube.position.set(0, 1, 0);
+      this.scene.add(visualCube);
+
+      this.physics.addEntity(
+        {
+          type: "dynamic",
+          colliders: [{ shape: "cuboid", parameters: [0.5, 0.5, 0.5] }],
+          position: { ...visualCube.position },
+        },
+        visualCube
+      );
+
+      this.physics.addEntity({
+        type: "static",
+        colliders: [
+          {
+            shape: "cuboid",
+            parameters: [100, 1, 100],
+          },
+        ],
+        position: { x: 0, y: -1.01, z: 0 },
+      });
     }
   }
 

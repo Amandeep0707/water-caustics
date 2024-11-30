@@ -24,7 +24,7 @@ export default class Experience extends EventEmitter {
 
     // Constants
     this.usePostProcessing = false;
-    this.usePhysics = true;
+    this.usePhysics = false;
 
     // Global Access
     window.experience = this;
@@ -40,10 +40,17 @@ export default class Experience extends EventEmitter {
     this.resources = new Resources(sources);
     this.camera = new Camera();
     this.renderer = new Renderer();
+    if (this.usePhysics) this.physics = new Physics();
+    if (this.usePostProcessing) this.postProcess = new PostProcess();
     this.world = new World();
 
-    if (this.usePostProcessing) this.postProcess = new PostProcess();
-    if (this.usePhysics) this.physics = new Physics();
+    if (this.physics) {
+      this.physics.on("init", () => {
+        this.world.init();
+      });
+    } else {
+      this.world.init();
+    }
 
     // Sizes resize event
     this.sizes.on("resize", () => {

@@ -1,10 +1,23 @@
 import * as THREE from "three/webgpu";
 import RAPIER from "https://cdn.skypack.dev/pin/@dimforge/rapier3d-compat@v0.14.0-9fFno0Co5H1pOBbDcBZz/mode=imports/optimized/@dimforge/rapier3d-compat.js";
 import Experience from "./Experience";
+import EventEmitter from "./Utils/EventEmitter";
 
-export class Physics {
+// // Process for adding physical enitties to the world
+// this.physics.addEntity(
+//   {
+//     type: "dynamic",  ** ['dyanmic', 'static', 'kinematic'] **
+//     colliders: [{ shape: "cuboid", parameters: [0.5, 0.5, 0.5] }], ** Shape and size of physics Collidor **
+//     position: { x: 0, y: 4, z: 0 }, ** Location of the Collidor **
+//   },
+//   visualGeometry ** Reference for the Visual Geometry to bind to **
+// );
+
+export class Physics extends EventEmitter {
   constructor() {
+    super();
     this.experience = new Experience();
+    this.useDebug = true;
 
     // Initialize entities map and key in the constructor
     this.entities = new Map();
@@ -14,36 +27,36 @@ export class Physics {
   }
 
   async init() {
-    this.physics = await RAPIER.init();
-    this.gravity = { x: 0.0, y: -9.81, z: 0.0 };
-    this.world = new RAPIER.World(this.gravity);
+    this.physics = await RAPIER.init().then(() => {
+      this.gravity = { x: 0.0, y: -9.81, z: 0.0 };
+      this.world = new RAPIER.World(this.gravity);
+      this.trigger("init");
 
-    // this.debugPhysics = new DebugPhysics();
+      if (this.useDebug) this.debugPhysics = new DebugPhysics();
 
-    const visualCube = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshNormalNodeMaterial()
-    );
-    this.experience.scene.add(visualCube);
-
-    this.addEntity(
-      {
-        type: "dynamic",
-        position: { x: 0, y: 4, z: 0 },
-        colliders: [{ shape: "cuboid", parameters: [0.5, 0.5, 0.5] }],
-      },
-      visualCube
-    );
-
-    this.addEntity({
-      type: "static",
-      colliders: [
-        {
-          shape: "cuboid",
-          parameters: [100, 1, 100],
-        },
-      ],
-      position: { x: 0, y: -1.01, z: 0 },
+      if (this.experience.debug.active) {
+        const physicsFolder = this.experience.debug.ui.addFolder({
+          title: "Physics",
+          expanded: false,
+        });
+        physicsFolder.addBinding({ gravity: this.gravity }, "gravity", {
+          label: "Gravity",
+        });
+        physicsFolder
+          .addButton({
+            title: "Toggle Debug",
+          })
+          .on("click", () => {
+            if (this.debugPhysics) {
+              this.debugPhysics.experience.off("tick");
+              this.experience.scene.remove(this.debugPhysics.lineSegments);
+              this.debugPhysics.destroy();
+              this.debugPhysics = null;
+            } else {
+              this.debugPhysics = new DebugPhysics();
+            }
+          });
+      }
     });
 
     this.experience.on("tick", () => {
@@ -76,6 +89,13 @@ export class Physics {
         _physicalDescription.position.x,
         _physicalDescription.position.y,
         _physicalDescription.position.z
+      );
+    }
+    if (_physicalDescription.rotation) {
+      rigidBodyDesc.setRotation(
+        _physicalDescription.rotation.x,
+        _physicalDescription.rotation.y,
+        _physicalDescription.rotation.z
       );
     }
 
@@ -129,8 +149,6 @@ export class Physics {
           }
         });
       }
-
-      // console.log(this.entities);
     }
   }
 }
@@ -138,7 +156,6 @@ export class Physics {
 export class DebugPhysics {
   constructor() {
     this.experience = new Experience();
-
     this.init();
   }
 
@@ -165,7 +182,7 @@ export class DebugPhysics {
   }
 
   update() {
-    if (this.experience.physics.world) {
+    if (this.geometry && this.experience.physics.world) {
       const { vertices, colors } = this.experience.physics.world.debugRender();
 
       this.geometry.attributes.position.array = vertices;
@@ -175,6 +192,13 @@ export class DebugPhysics {
       this.geometry.attributes.color.array = colors;
       this.geometry.attributes.color.count = colors.length / 4;
       this.geometry.attributes.color.needsUpdate = true;
+    }
+  }
+
+  destroy() {
+    if (this.lineSegments) {
+      this.material.dispose();
+      this.geometry.dispose();
     }
   }
 }
