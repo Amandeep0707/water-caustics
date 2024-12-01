@@ -24,7 +24,7 @@ export default class Experience extends EventEmitter {
 
     // Constants
     this.usePostProcessing = false;
-    this.usePhysics = false;
+    this.usePhysics = true;
 
     // Global Access
     window.experience = this;

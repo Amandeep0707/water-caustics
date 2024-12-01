@@ -1,5 +1,5 @@
 import * as THREE from "three/webgpu";
-import RAPIER from "https://cdn.skypack.dev/pin/@dimforge/rapier3d-compat@v0.14.0-9fFno0Co5H1pOBbDcBZz/mode=imports/optimized/@dimforge/rapier3d-compat.js";
+import RAPIER from "@dimforge/rapier3d-compat";
 import Experience from "./Experience";
 import EventEmitter from "./Utils/EventEmitter";
 
@@ -26,13 +26,19 @@ export class Physics extends EventEmitter {
     this.init();
   }
 
-  async init() {
-    this.physics = await RAPIER.init().then(() => {
+  init() {
+    this.physics = RAPIER.init().then(() => {
       this.gravity = { x: 0.0, y: -9.81, z: 0.0 };
       this.world = new RAPIER.World(this.gravity);
       this.trigger("init");
 
       if (this.useDebug) this.debugPhysics = new DebugPhysics();
+
+      this.addEntity({
+        type: "static",
+        colliders: [{ shape: "cuboid", parameters: [100, 1, 100] }],
+        position: { x: 0, y: -1, z: 0 },
+      });
 
       if (this.experience.debug.active) {
         const physicsFolder = this.experience.debug.ui.addFolder({
