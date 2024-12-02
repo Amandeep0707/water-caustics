@@ -1,7 +1,7 @@
 import * as THREE from "three/webgpu";
 import RAPIER from "@dimforge/rapier3d-compat";
 import Experience from "./Experience";
-import EventEmitter from "./Utils/EventEmitter";
+import EventEmitter from "../Utils/EventEmitter";
 
 // // Process for adding physical enitties to the world
 // this.physics.addEntity(

@@ -1,15 +1,15 @@
 import * as THREE from "three/webgpu";
-import EventEmitter from "./Utils/EventEmitter.js";
-import Sizes from "./Utils/Sizes.js";
-import Time from "./Utils/Time.js";
-import Camera from "./Camera.js";
-import Renderer from "./Renderer.js";
-import World from "./World/World.js";
-import Debug from "./Utils/Debug.js";
-import Resources from "./Utils/Resources.js";
-import sources from "./sources.js";
-import PostProcess from "./PostProcess.js";
-import { Physics, DebugPhysics } from "./Physics.js";
+import EventEmitter from "../Utils/EventEmitter.js";
+import Sizes from "../Utils/Sizes.js";
+import Time from "../Utils/Time.js";
+import Camera from "../core/Camera.js";
+import Renderer from "../core/Renderer.js";
+import World from "../World/World.js";
+import Debug from "../Utils/Debug.js";
+import Resources from "../Utils/Resources.js";
+import sources from "../core/sources.js";
+import PostProcess from "../core/PostProcess.js";
+import { Physics } from "../core/Physics.js";
 
 let instance = null;
 
@@ -77,7 +77,7 @@ export default class Experience extends EventEmitter {
 
     this.camera.update();
     this.world.update();
-    this.renderer.update();
+    // this.renderer.update();
     if (this.postProcess) this.postProcess.update();
 
     // Frame trace ends here

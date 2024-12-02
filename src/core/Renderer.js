@@ -1,6 +1,6 @@
 import * as THREE from "three/webgpu";
 import Experience from "./Experience";
-import EventEmitter from "./Utils/EventEmitter";
+import EventEmitter from "../Utils/EventEmitter";
 
 export default class Renderer extends EventEmitter {
   constructor() {
@@ -14,6 +14,10 @@ export default class Renderer extends EventEmitter {
     this.camera = this.experience.camera;
 
     this.setInstance();
+
+    this.experience.on("tick", () => {
+      this.update();
+    });
   }
 
   setInstance() {

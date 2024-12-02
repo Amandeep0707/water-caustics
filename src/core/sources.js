@@ -20,8 +20,13 @@ export default [
     path: "models/DamagedHelmet.glb",
   },
   {
+    name: "asciiTexture",
+    type: "texture",
+    path: "textures/asciiCharacterSheet.jpg",
+  },
+  {
     name: "testTexture",
     type: "texture",
-    path: "textures/testImage.png",
+    path: "textures/testImage.jpg",
   },
 ];

@@ -1,6 +1,6 @@
 import * as THREE from "three/webgpu";
 import * as TSL from "three/tsl";
-import Experience from "../Experience";
+import Experience from "../core/Experience";
 
 export default class Grid {
   constructor(scene, camera) {
