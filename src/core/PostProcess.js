@@ -1,7 +1,6 @@
 import * as THREE from "three/webgpu";
 import * as TSL from "three/tsl";
 import Experience from "./Experience";
-import { bloom } from "three/addons/tsl/display/BloomNode.js";
 
 export default class PostProcess {
   constructor() {
@@ -14,52 +13,97 @@ export default class PostProcess {
     const scenePass = TSL.pass(this.scene, this.camera);
     const scenePassColor = scenePass.getTextureNode("output");
 
-    const bloomPass = bloom(scenePassColor);
+    this.experience.resources.on("ready", () => {
+      // Constants
+      const imageWidth = TSL.uniform(100);
+      const imageHeight = TSL.uniform(80);
+      const characterWidth = TSL.uniform(10);
+      const characterHeight = TSL.uniform(10);
 
-    this.postProcessing = new THREE.PostProcessing(this.renderer);
-    this.postProcessing.outputNode = scenePassColor.add(bloomPass);
+      const asciiTexture = this.experience.resources.items.asciiTexture;
+      asciiTexture.magFilter = THREE.NearestFilter;
+      asciiTexture.minFilter = THREE.NearestFilter;
+      asciiTexture.wrapS = THREE.RepeatWrapping;
 
-    if (this.experience.debug.active) {
-      const bloomParams = {
-        threshold: TSL.uniform(0.2),
-        strength: TSL.uniform(0.15),
-        radius: TSL.uniform(0.8),
-      };
-      const postProcessFolder = this.experience.debug.ui.addFolder({
-        title: "Post Process",
-        expanded: false,
+      scenePassColor.uvNode = gridUV();
+
+      function gridUV() {
+        const xComp = TSL.div(
+          TSL.floor(TSL.mul(imageWidth, TSL.uv().x)),
+          imageWidth
+        );
+
+        const yComp = TSL.div(
+          TSL.floor(TSL.mul(imageHeight, TSL.uv().y)),
+          imageHeight
+        );
+
+        return TSL.vec2(xComp, yComp);
+      }
+
+      function characterGridUV() {
+        const xComp = TSL.div(
+          TSL.mod(TSL.mul(imageWidth, TSL.uv().x), TSL.uniform(1)),
+          TSL.uniform(characterWidth)
+        );
+        const yComp = TSL.div(
+          TSL.mod(TSL.mul(imageHeight, TSL.uv().y), TSL.uniform(1)),
+          TSL.uniform(characterHeight)
+        );
+
+        return TSL.vec2(xComp, yComp);
+      }
+
+      function offsetX() {
+        return TSL.div(
+          TSL.floor(
+            TSL.mul(
+              TSL.dot(scenePassColor, TSL.vec3(0.2125, 0.7154, 0.0721)),
+              characterWidth
+            )
+          ),
+          characterWidth
+        );
+      }
+
+      function offsetY() {
+        return TSL.mul(
+          TSL.round(TSL.mul(TSL.uniform(Math.random()), characterHeight)),
+          TSL.div(TSL.uniform(1), characterHeight)
+        );
+      }
+
+      const fragmentShader = TSL.Fn(() => {
+        const finalUV = TSL.add(
+          characterGridUV(),
+          TSL.vec2(offsetX().x, offsetY().x)
+        );
+
+        return TSL.texture(asciiTexture, finalUV);
       });
-      postProcessFolder
-        .addBinding(bloomParams.threshold, "value", {
-          min: 0,
-          max: 1,
-          step: 0.01,
-          label: "Bloom Threshold",
-        })
-        .on("change", (e) => {
-          bloomPass.threshold.value = e.value;
+
+      this.postProcessing = new THREE.PostProcessing(this.renderer);
+      this.postProcessing.outputNode = fragmentShader();
+
+      if (this.experience.debug.active) {
+        const postProcessFolder = this.experience.debug.ui.addFolder({
+          title: "Post Process",
+          expanded: false,
         });
-      postProcessFolder
-        .addBinding(bloomParams.strength, "value", {
-          min: 0,
-          max: 1,
-          step: 0.01,
-          label: "Bloom Strength",
-        })
-        .on("change", (e) => {
-          bloomPass.strength.value = e.value;
+        postProcessFolder.addBinding(imageWidth, "value", {
+          min: 10,
+          max: 1000,
+          step: 1,
+          label: "Screen Width",
         });
-      postProcessFolder
-        .addBinding(bloomParams.radius, "value", {
-          min: 0,
-          max: 1,
-          step: 0.01,
-          label: "Bloom Radius",
-        })
-        .on("change", (e) => {
-          bloomPass.radius.value = e.value;
+        postProcessFolder.addBinding(imageHeight, "value", {
+          min: 10,
+          max: 1000,
+          step: 1,
+          label: "Screen Height",
         });
-    }
+      }
+    });
   }
 
   resize() {}

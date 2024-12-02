@@ -23,7 +23,7 @@ export default class Experience extends EventEmitter {
     instance = this;
 
     // Constants
-    this.usePostProcessing = false;
+    this.usePostProcessing = true;
     this.usePhysics = false;
 
     // Global Access
