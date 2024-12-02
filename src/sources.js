@@ -19,4 +19,9 @@ export default [
     type: "gltfModel",
     path: "models/DamagedHelmet.glb",
   },
+  {
+    name: "testTexture",
+    type: "texture",
+    path: "textures/testImage.png",
+  },
 ];

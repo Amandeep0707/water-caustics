@@ -1,8 +1,8 @@
 import * as THREE from "three/webgpu";
+import * as TSL from "three/tsl";
 import Experience from "../Experience";
 import Environment from "./Environment";
 import Grid from "../Utils/Grid";
-import VehicleController from "../Utils/VehicleController";
 
 export default class World {
   constructor() {
@@ -23,12 +23,30 @@ export default class World {
   }
 
   init() {
-    if (this.physics) {
+    const testPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(10, 10, 10),
+      new THREE.MeshStandardNodeMaterial()
+    );
+    this.scene.add(testPlane);
+
+    const offset = TSL.uniform((0, 0), "vec2");
+
+    function luminance(color) {
+      return TSL.dot(color, TSL.vec3(0.299, 0.587, 0.114));
     }
+
+    // function transformUV(uv) {
+    //   let zoomUV = uv.mul(TSL.uniform(2).sub(TSL.uniform(1)));
+    //   zoomUV = zoomUV.add();
+    // }
+
+    const fragmentShader = TSL.Fn(() => {
+      return TSL.texture(this.resources.items.testTexture, TSL.uv());
+    });
+
+    testPlane.material.colorNode = fragmentShader();
+    testPlane.material.roughnessNode = TSL.uniform(0);
   }
 
-  update() {
-    if (this.physics && this.vehicle) {
-    }
-  }
+  update() {}
 }
