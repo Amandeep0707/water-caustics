@@ -21,6 +21,14 @@ export default class World {
       this.environment = new Environment();
 
       this.scene.add(this.resources.items.damagedHelmet.scene);
+
+      this.PlaneGeometry = new THREE.PlaneGeometry(10, 10);
+      this.planeMaterial = new THREE.MeshStandardNodeMaterial();
+      this.planeMaterial.roughnessNode = 0.1;
+      this.planeMesh = new THREE.Mesh(this.PlaneGeometry, this.planeMaterial);
+      this.planeMesh.rotateX(-Math.PI / 2);
+      this.planeMesh.position.y = -0.01;
+      this.scene.add(this.planeMesh);
     });
   }
 

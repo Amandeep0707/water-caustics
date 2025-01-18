@@ -22,11 +22,6 @@ export default [
   {
     name: "asciiTexture",
     type: "texture",
-    path: "textures/asciiCharacterSheet.jpg",
-  },
-  {
-    name: "testTexture",
-    type: "texture",
-    path: "textures/testImage.jpg",
+    path: "textures/fillASCII.png",
   },
 ];
