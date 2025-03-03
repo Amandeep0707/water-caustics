@@ -24,7 +24,7 @@ export default class Camera {
       this.nearClip,
       this.farClip
     );
-    this.instance.position.set(0, 2, 5);
+    this.instance.position.set(0, 0.2, 0.5);
     this.instance.lookAt(0, 0, 0);
   }
 

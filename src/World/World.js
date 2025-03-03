@@ -14,20 +14,23 @@ export default class World {
     this.time = this.experience.time;
     this.debug = this.experience.debug;
     this.resources = this.experience.resources;
-    this.grid = new Grid(this.scene, this.camera);
 
     this.resources.on("ready", () => {
       // Setup
       this.environment = new Environment();
 
-      this.scene.add(this.resources.items.damagedHelmet.scene);
+      const ring = this.resources.items.ring.scene;
+      ring.position.y = 0.029;
+      ring.rotateX(-Math.PI / 25.15);
+      ring.children[1].material.ior = 2.3;
+      this.scene.add(ring);
 
-      this.PlaneGeometry = new THREE.PlaneGeometry(10, 10);
+      this.PlaneGeometry = new THREE.PlaneGeometry(5, 5);
       this.planeMaterial = new THREE.MeshStandardNodeMaterial();
-      this.planeMaterial.roughnessNode = 0.1;
+      this.planeMaterial.color = new THREE.Color("#a7b4d4");
+      this.planeMaterial.roughnessNode = 0.5;
       this.planeMesh = new THREE.Mesh(this.PlaneGeometry, this.planeMaterial);
       this.planeMesh.rotateX(-Math.PI / 2);
-      this.planeMesh.position.y = -0.01;
       this.scene.add(this.planeMesh);
     });
   }

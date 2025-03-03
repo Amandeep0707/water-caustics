@@ -15,9 +15,9 @@ export default [
     path: "textures/environments/lighting.hdr",
   },
   {
-    name: "damagedHelmet",
+    name: "ring",
     type: "gltfModel",
-    path: "models/DamagedHelmet.glb",
+    path: "models/ring.glb",
   },
   {
     name: "asciiTexture",
